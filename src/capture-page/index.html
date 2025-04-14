@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Sync - Audio Capture</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Sync - Meeting Audio Capture</h1>
+        <div class="status-container">
+            <div id="status" class="status">Connecting...</div>
+        </div>
+        <div class="instruction-container">
+            <div class="instruction-step">
+                <h3>1. Select the browser tab with your meeting</h3>
+                <p>When prompted, choose the tab where your meeting is running (Zoom, Google Meet, etc.)</p>
+                <p>Make sure to check "Share tab audio" when selecting the tab.</p>
+            </div>
+            <div class="instruction-step">
+                <h3>2. Grant microphone access</h3>
+                <p>Allow microphone access when prompted to capture your voice.</p>
+            </div>
+            <div class="instruction-step">
+                <h3>3. Recording Controls</h3>
+                <div class="controls" id="controls">
+                    <button id="stop-btn" class="btn stop-btn" disabled>Stop Recording</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="capture.js"></script>
+</body>
+</html>

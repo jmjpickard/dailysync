@@ -1,0 +1,19 @@
+cmd_Release/obj.target/audio_capture_addon/src/main.o := c++ '-DNODE_GYP_MODULE_NAME=audio_capture_addon' '-DUSING_UV_SHARED=1' '-DUSING_V8_SHARED=1' '-DV8_DEPRECATION_WARNINGS=1' '-D_GLIBCXX_USE_CXX11_ABI=1' '-DELECTRON_ENSURE_CONFIG_GYPI' '-D_DARWIN_USE_64_BIT_INODE=1' '-D_LARGEFILE_SOURCE' '-D_FILE_OFFSET_BITS=64' '-DUSING_ELECTRON_CONFIG_GYPI' '-DV8_COMPRESS_POINTERS' '-DV8_COMPRESS_POINTERS_IN_ISOLATE_CAGE' '-DV8_31BIT_SMIS_ON_64BIT_ARCH' '-DV8_ENABLE_SANDBOX' '-DOPENSSL_NO_PINSHARED' '-DOPENSSL_THREADS' '-DOPENSSL_NO_ASM' '-DNAPI_DISABLE_CPP_EXCEPTIONS' '-DBUILDING_NODE_EXTENSION' -I/Users/jackpickard/.electron-gyp/35.1.4/include/node -I/Users/jackpickard/.electron-gyp/35.1.4/src -I/Users/jackpickard/.electron-gyp/35.1.4/deps/openssl/config -I/Users/jackpickard/.electron-gyp/35.1.4/deps/openssl/openssl/include -I/Users/jackpickard/.electron-gyp/35.1.4/deps/uv/include -I/Users/jackpickard/.electron-gyp/35.1.4/deps/zlib -I/Users/jackpickard/.electron-gyp/35.1.4/deps/v8/include -I/Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api -I../src  -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=12.3 -arch arm64 -Wall -Wendif-labels -W -Wno-unused-parameter -Wno-availability -std=gnu++20 -stdlib=libc++ -fno-rtti -ObjC++ -std=c++17  -MMD -MF ./Release/.deps/Release/obj.target/audio_capture_addon/src/main.o.d.raw -c -o Release/obj.target/audio_capture_addon/src/main.o ../src/main.mm
+Release/obj.target/audio_capture_addon/src/main.o: ../src/main.mm \
+  /Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api/napi.h \
+  /Users/jackpickard/.electron-gyp/35.1.4/include/node/node_api.h \
+  /Users/jackpickard/.electron-gyp/35.1.4/include/node/js_native_api.h \
+  /Users/jackpickard/.electron-gyp/35.1.4/include/node/js_native_api_types.h \
+  /Users/jackpickard/.electron-gyp/35.1.4/include/node/node_api_types.h \
+  /Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api/napi-inl.h \
+  /Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api/napi-inl.deprecated.h \
+  ../src/audio_capture.h
+../src/main.mm:
+/Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api/napi.h:
+/Users/jackpickard/.electron-gyp/35.1.4/include/node/node_api.h:
+/Users/jackpickard/.electron-gyp/35.1.4/include/node/js_native_api.h:
+/Users/jackpickard/.electron-gyp/35.1.4/include/node/js_native_api_types.h:
+/Users/jackpickard/.electron-gyp/35.1.4/include/node/node_api_types.h:
+/Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api/napi-inl.h:
+/Users/jackpickard/Documents/repos/daily-sync/native-addon/audio-capture/node_modules/node-addon-api/napi-inl.deprecated.h:
+../src/audio_capture.h:

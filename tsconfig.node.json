@@ -1,0 +1,35 @@
+// tsconfig.node.json (Updated)
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ESNext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true
+    // Add outDir and rootDir if needed for clarity, though electron-vite might manage this
+    // "outDir": "../../dist-electron/main", // Example
+    // "rootDir": "../../src/main"          // Example
+  },
+  "include": [
+    "electron.vite.config.*",
+    "src/main/**/*.ts",
+    "src/types/**/*.ts",
+    "src/preload/**/*.ts",
+    // === Add paths/globs for ALL TS files imported by main/preload ===
+    "src/auth/**/*.ts",
+    "src/transcription/**/*.ts", // Will include setup.ts, queue.ts, main-paths.ts etc.
+    "src/audio-mixer.ts",
+    "src/storage/**/*.ts", // Includes store.ts, mainSettings.ts
+    "src/llm/**/*.ts" // If main uses anything from here directly
+    // Add any other relevant top-level src directories with .ts files used by main/preload
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "dist-electron"
+    // Exclude renderer source if not already handled by project references
+    // "src/renderer"
+  ]
+}

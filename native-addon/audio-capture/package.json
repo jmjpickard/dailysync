@@ -1,0 +1,23 @@
+{
+  "name": "audio-capture-addon",
+  "version": "1.0.0",
+  "description": "Native module for macOS audio capture",
+  "main": "index.js",
+  "scripts": {
+    "install": "node-gyp rebuild",
+    "build": "node-gyp rebuild"
+  },
+  "keywords": [
+    "audio",
+    "capture",
+    "macos",
+    "screencapturekit"
+  ],
+  "author": "Daily Sync",
+  "license": "ISC",
+  "dependencies": {
+    "node-addon-api": "^7.0.0",
+    "bindings": "^1.5.0"
+  },
+  "gypfile": true
+}
