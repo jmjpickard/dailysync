@@ -1417,7 +1417,12 @@ ipcMain.handle(
   "save-meeting-note",
   async (event: IpcMainInvokeEvent, eventId: string, noteContent: string) => {
     try {
-      console.log("Saving meeting note for event:", eventId, "content length:", noteContent.length);
+      console.log(
+        "Saving meeting note for event:",
+        eventId,
+        "content length:",
+        noteContent.length
+      );
       saveMeetingNote(eventId, noteContent);
       console.log("Meeting note saved successfully");
       return { success: true };
@@ -1493,9 +1498,14 @@ ipcMain.handle(
     try {
       console.log("Loading transcript for event:", eventId);
       const transcriptData = loadTranscript(eventId);
-      console.log("Transcript data loaded:", transcriptData ? 
-        `Status: ${transcriptData.status}, Text length: ${transcriptData.text?.length || 0}` : 
-        "No transcript found");
+      console.log(
+        "Transcript data loaded:",
+        transcriptData
+          ? `Status: ${transcriptData.status}, Text length: ${
+              transcriptData.text?.length || 0
+            }`
+          : "No transcript found"
+      );
       return { success: true, data: transcriptData };
     } catch (error: any) {
       console.error("Error loading transcript:", error);
@@ -1533,11 +1543,11 @@ ipcMain.handle(
   async (event: IpcMainInvokeEvent, eventId: string) => {
     try {
       const summaryData = loadSummary(eventId);
-      console.log('Load summary for event:', eventId, 'Data:', summaryData);
-      
+      console.log("Load summary for event:", eventId, "Data:", summaryData);
+
       // If we have a summary, make sure we're consistent with property names
       if (summaryData) {
-        summaryData.summary = summaryData.summary || summaryData.text;
+        summaryData.summary = summaryData.summary || "";
       }
       return { success: true, data: summaryData };
     } catch (error: any) {
@@ -1676,10 +1686,10 @@ ipcMain.handle(
           ollamaUrl: settings.ollamaUrl,
           ollamaModel: settings.ollamaModel,
           claudeKey: settings.claudeKey,
-          geminiKey: settings.geminiKey
-        }
+          geminiKey: settings.geminiKey,
+        },
       };
-      
+
       // Save the updated settings
       saveAllSettings(updatedSettings);
 
@@ -1724,8 +1734,8 @@ ipcMain.handle(
         case "ollama": {
           // Use the LLM settings directly from the form
           const llmSettings = loadAllSettings().llmSettings || {};
-          apiKeyOrUrl = llmSettings.ollamaUrl || '';
-          modelName = llmSettings.ollamaModel || 'llama3';
+          apiKeyOrUrl = llmSettings.ollamaUrl || "";
+          modelName = llmSettings.ollamaModel || "llama3";
 
           if (!apiKeyOrUrl) {
             return {
@@ -1740,7 +1750,7 @@ ipcMain.handle(
         case "claude": {
           // Use the LLM settings directly from the form
           const llmSettings = loadAllSettings().llmSettings || {};
-          apiKeyOrUrl = llmSettings.claudeKey || '';
+          apiKeyOrUrl = llmSettings.claudeKey || "";
 
           if (!apiKeyOrUrl) {
             return {
@@ -1755,7 +1765,7 @@ ipcMain.handle(
         case "gemini": {
           // Use the LLM settings directly from the form
           const llmSettings = loadAllSettings().llmSettings || {};
-          apiKeyOrUrl = llmSettings.geminiKey || '';
+          apiKeyOrUrl = llmSettings.geminiKey || "";
 
           if (!apiKeyOrUrl) {
             return {
@@ -1786,7 +1796,12 @@ ipcMain.handle(
       );
 
       // Save the summary to storage
-      console.log('Saving summary for event:', eventId, 'Summary text:', summary);
+      console.log(
+        "Saving summary for event:",
+        eventId,
+        "Summary text:",
+        summary
+      );
       saveSummary(eventId, summary, serviceType);
 
       return {

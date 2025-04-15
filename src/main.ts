@@ -20,10 +20,7 @@ import {
 } from "./auth/google-auth";
 import audioCaptureAddon from "audio-capture-addon";
 import { mixAudioFiles } from "./audio-mixer";
-import {
-  checkSetup as checkTranscriptionSetup,
-  getModels as getWhisperModels,
-} from "./transcription/setup";
+import setupFunctions from "./transcription/setup";
 
 // Browser audio capture imports
 import http from "http";
@@ -108,25 +105,24 @@ console.log(`Serving capture page from: ${CAPTURE_PAGE_DIR}`);
 console.log(`Current __dirname: ${__dirname}`);
 
 function createWindow(): void {
-  // Create the browser window with reasonable default dimensions
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    title: "Daily Sync",
     webPreferences: {
-      nodeIntegration: true, // For simplicity in this initial version
-      contextIsolation: false, // For simplicity in this initial version
-      // We'll add preload script later for better security
+      nodeIntegration: true,
+      contextIsolation: false,
+      webSecurity: true,
     },
   });
 
-  // Load the index.html file from the dist folder
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  // Load the appropriate URL based on the environment
+  if (process.env.NODE_ENV === "development") {
+    mainWindow.loadURL("http://localhost:5173");
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+  }
 
-  // Open DevTools in development
-  // mainWindow.webContents.openDevTools();
-
-  // Handle window being closed
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
@@ -500,14 +496,14 @@ app.whenReady().then(async () => {
 ipcMain.handle("get-google-auth-status", async () => {
   const isAuth = await isAuthenticated();
   let email = "";
-  
+
   // You would need to implement a way to get the user's email
   // This could be stored when they authenticate or fetched from Google
   // For now we'll return a placeholder
-  
+
   return {
     authenticated: isAuth,
-    email: isAuth ? "user@example.com" : ""
+    email: isAuth ? "user@example.com" : "",
   };
 });
 
@@ -1229,14 +1225,14 @@ import { getSetting, getSettings } from "./storage/mainSettings";
  * Check if the transcription dependencies are properly set up
  */
 ipcMain.handle("check-transcription-setup", () => {
-  return checkTranscriptionSetup();
+  return setupFunctions.checkSetup();
 });
 
 /**
  * Get available whisper models
  */
 ipcMain.handle("get-whisper-models", () => {
-  return getWhisperModels();
+  return setupFunctions.getModels();
 });
 
 // Initialize transcription queue when app is ready
@@ -1436,7 +1432,7 @@ ipcMain.handle(
   async (
     event: IpcMainInvokeEvent,
     eventId: string,
-    status: 'completed' | 'failed',
+    status: "completed" | "failed",
     transcript?: string,
     error?: string
   ) => {
@@ -1628,115 +1624,136 @@ ipcMain.handle("load-all-settings", async () => {
 /**
  * Save LLM settings
  */
-ipcMain.handle("save-llm-settings", async (event: IpcMainInvokeEvent, settings: {
-  ollamaUrl: string;
-  ollamaModel: string;
-  claudeKey: string;
-  geminiKey: string;
-}) => {
-  try {
-    // Save each setting individually
-    saveSetting('llmApiKeys.ollama', settings.ollamaUrl);
-    saveSetting('ollamaModel', settings.ollamaModel);
-    saveSetting('llmApiKeys.claude', settings.claudeKey);
-    saveSetting('llmApiKeys.gemini', settings.geminiKey);
-    
-    return { success: true };
-  } catch (error: any) {
-    console.error("Error saving LLM settings:", error);
-    return { error: error.message || "Failed to save LLM settings" };
+ipcMain.handle(
+  "save-llm-settings",
+  async (
+    event: IpcMainInvokeEvent,
+    settings: {
+      ollamaUrl: string;
+      ollamaModel: string;
+      claudeKey: string;
+      geminiKey: string;
+    }
+  ) => {
+    try {
+      // Save each setting individually
+      saveSetting("llmApiKeys.ollama", settings.ollamaUrl);
+      saveSetting("ollamaModel", settings.ollamaModel);
+      saveSetting("llmApiKeys.claude", settings.claudeKey);
+      saveSetting("llmApiKeys.gemini", settings.geminiKey);
+
+      return { success: true };
+    } catch (error: any) {
+      console.error("Error saving LLM settings:", error);
+      return { error: error.message || "Failed to save LLM settings" };
+    }
   }
-});
+);
 
 /**
  * Generate a summary using specified LLM service
  */
-ipcMain.handle("generate-summary", async (event: IpcMainInvokeEvent, eventId: string, serviceType: 'ollama' | 'claude' | 'gemini') => {
-  try {
-    // Load the transcript for this event
-    const transcriptData = loadTranscript(eventId);
-    
-    // Check if we have a transcript
-    if (!transcriptData?.text) {
-      return { 
-        success: false,
-        error: "No transcript found for this event" 
-      };
-    }
-    
-    // Get the transcript text
-    const transcriptText = transcriptData.text;
-    
-    // Load the appropriate API key/URL/model from settings
-    let apiKeyOrUrl: string;
-    let modelName: string | null = null;
-    
-    switch (serviceType) {
-      case 'ollama': {
-        apiKeyOrUrl = loadSetting('llmApiKeys.ollama', '');
-        modelName = loadSetting('ollamaModel', 'llama3');
-        
-        if (!apiKeyOrUrl) {
-          return {
-            success: false,
-            error: "Ollama URL not configured. Please set it in the Settings."
-          };
-        }
-        break;
-      }
-      
-      case 'claude': {
-        apiKeyOrUrl = loadSetting('llmApiKeys.claude', '');
-        
-        if (!apiKeyOrUrl) {
-          return {
-            success: false,
-            error: "Claude API key not configured. Please set it in the Settings."
-          };
-        }
-        break;
-      }
-      
-      case 'gemini': {
-        apiKeyOrUrl = loadSetting('llmApiKeys.gemini', '');
-        
-        if (!apiKeyOrUrl) {
-          return {
-            success: false,
-            error: "Gemini API key not configured. Please set it in the Settings."
-          };
-        }
-        break;
-      }
-      
-      default:
+ipcMain.handle(
+  "generate-summary",
+  async (
+    event: IpcMainInvokeEvent,
+    eventId: string,
+    serviceType: "ollama" | "claude" | "gemini"
+  ) => {
+    try {
+      // Load the transcript for this event
+      const transcriptData = loadTranscript(eventId);
+
+      // Check if we have a transcript
+      if (!transcriptData?.text) {
         return {
           success: false,
-          error: `Unsupported LLM service: ${serviceType}`
+          error: "No transcript found for this event",
         };
+      }
+
+      // Get the transcript text
+      const transcriptText = transcriptData.text;
+
+      // Load the appropriate API key/URL/model from settings
+      let apiKeyOrUrl: string;
+      let modelName: string | null = null;
+
+      switch (serviceType) {
+        case "ollama": {
+          apiKeyOrUrl = loadSetting("llmApiKeys.ollama", "");
+          modelName = loadSetting("ollamaModel", "llama3");
+
+          if (!apiKeyOrUrl) {
+            return {
+              success: false,
+              error:
+                "Ollama URL not configured. Please set it in the Settings.",
+            };
+          }
+          break;
+        }
+
+        case "claude": {
+          apiKeyOrUrl = loadSetting("llmApiKeys.claude", "");
+
+          if (!apiKeyOrUrl) {
+            return {
+              success: false,
+              error:
+                "Claude API key not configured. Please set it in the Settings.",
+            };
+          }
+          break;
+        }
+
+        case "gemini": {
+          apiKeyOrUrl = loadSetting("llmApiKeys.gemini", "");
+
+          if (!apiKeyOrUrl) {
+            return {
+              success: false,
+              error:
+                "Gemini API key not configured. Please set it in the Settings.",
+            };
+          }
+          break;
+        }
+
+        default:
+          return {
+            success: false,
+            error: `Unsupported LLM service: ${serviceType}`,
+          };
+      }
+
+      // Import the generateSummary function here to avoid circular dependencies
+      const { generateSummary } = await import("./llm/api");
+
+      // Generate the summary
+      const summary = await generateSummary(
+        transcriptText,
+        serviceType,
+        apiKeyOrUrl,
+        modelName
+      );
+
+      // Save the summary to storage
+      saveSummary(eventId, summary, serviceType);
+
+      return {
+        success: true,
+        summary,
+      };
+    } catch (error: any) {
+      console.error("Error generating summary:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to generate summary",
+      };
     }
-    
-    // Import the generateSummary function here to avoid circular dependencies
-    const { generateSummary } = await import('./llm/api');
-    
-    // Generate the summary
-    const summary = await generateSummary(transcriptText, serviceType, apiKeyOrUrl, modelName);
-    
-    // Save the summary to storage
-    saveSummary(eventId, summary, serviceType);
-    
-    return {
-      success: true,
-      summary
-    };
-  } catch (error: any) {
-    console.error("Error generating summary:", error);
-    return {
-      success: false,
-      error: error.message || "Failed to generate summary"
-    };
   }
-});
+);
 
 /**
  * Export content to a file
